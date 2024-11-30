@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الجرائم الواقعة على السرقة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        select, button {
+            padding: 10px;
+            margin-bottom: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        .checkbox-group {
+            margin: 10px 0;
+        }
+
+        #finalPunishment {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: darkred;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>نظام الجرائم الواقعة على السرقة</h1>
+
+        <!-- اختيار المادة -->
+        <form id="guidelinesForm">
+            <label for="article">اختر المادة القانونية:</label>
+            <select id="article">
+                <option value="400">المادة 400: السرقة المشددة</option>
+                <option value="402">المادة 402: السرقة باستخدام العنف أو التهديد</option>
+            </select>
+            <button type="button" id="viewDetailsBtn">عرض التفاصيل</button>
+        </form>
+
+        <!-- تفاصيل المادة -->
+        <div id="details">
+            <h2>تفاصيل المادة</h2>
+            <table>
+                <tr>
+                    <th>التصنيف</th>
+                    <td id="classification"></td>
+                </tr>
+                <tr>
+                    <th>العقوبة الأساسية</th>
+                    <td id="punishment"></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- تفسير النقاط والعقوبات -->
+        <div id="interpretation">
+            <h2>تفسير النقاط والعقوبات</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>النقاط الإجمالية</th>
+                        <th>خطورة الجريمة</th>
+                        <th>العقوبة المقترحة</th>
+                    </tr>
+                </thead>
+                <tbody id="interpretationTable">
+                    <!-- سيتم تحديث البيانات ديناميكيًا -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- العوامل المشددة والمخففة -->
+        <div id="factors">
+            <h2>حدد العوامل المشددة والمخففة</h2>
+            <div class="checkbox-group">
+                <h3>العوامل المشددة:</h3>
+                <div id="aggravatingFactors"></div>
+            </div>
+            <div class="checkbox-group">
+                <h3>العوامل المخففة:</h3>
+                <div id="mitigatingFactors"></div>
+            </div>
+            <button type="button" id="calculateBtn">احسب النقاط</button>
+        </div>
+
+        <!-- نتيجة الحساب -->
+        <div id="result"></div>
+        <div id="finalPunishment"></div>
+    </div>
+
+    <script>
+        const articles = [
+            {
+                article: 400,
+                classification: "جناية",
+                title: "السرقة المشددة",
+                base_punishment: "الأشغال الشاقة لمدة لا تقل عن خمس سنوات",
+                interpretation: [
+                    { points: "0-3", severity: "منخفضة", punishment: "الحبس من 3 إلى 5 سنوات" },
+                    { points: "4-6", severity: "متوسطة", punishment: "الأشغال الشاقة المؤقتة لمدة 7 سنوات" },
+                    { points: "7+", severity: "عالية", punishment: "الأشغال الشاقة لمدة لا تقل عن 10 سنوات" }
+                ],
+                aggravating_factors: [
+                    { description: "ارتكاب السرقة ليلاً", points: 1 },
+                    { description: "السرقة تمت بواسطة شخصين أو أكثر", points: 2 },
+                    { description: "حيازة السلاح أثناء السرقة", points: 3 },
+                    { description: "دخول الأماكن الخاصة بطريقة غير مشروعة", points: 2 },
+                    { description: "استخدام وسائل متقدمة مثل الكسر أو التسلق", points: 1 }
+                ],
+                mitigating_factors: [
+                    { description: "إعادة المسروقات بالكامل قبل المحاكمة", points: -2 },
+                    { description: "التعاون مع السلطات للكشف عن الجريمة أو المتهمين الآخرين", points: -3 },
+                    { description: "إثبات الندم أو السعي لإصلاح الضرر", points: -1 }
+                ]
+            },
+            {
+                article: 402,
+                classification: "جناية",
+                title: "السرقة باستخدام العنف أو التهديد",
+                base_punishment: "الأشغال الشاقة المؤقتة لمدة لا تقل عن سبع سنوات",
+                interpretation: [
+                    { points: "0-2", severity: "منخفضة", punishment: "الأشغال الشاقة لمدة 5 سنوات" },
+                    { points: "3-5", severity: "متوسطة", punishment: "الأشغال الشاقة المؤقتة لمدة 7 سنوات" },
+                    { points: "6+", severity: "عالية", punishment: "الأشغال الشاقة لمدة لا تقل عن 10 سنوات" }
+                ],
+                aggravating_factors: [
+                    { description: "استخدام العنف الجسدي أثناء السرقة", points: 3 },
+                    { description: "تهديد الضحية بالقتل أو الأذى الجسدي", points: 2 },
+                    { description: "السرقة تمت من منشأة حكومية", points: 2 },
+                    { description: "استخدام أسلحة نارية أثناء السرقة", points: 3 }
+                ],
+                mitigating_factors: [
+                    { description: "إعادة المسروقات والتعويض عن الأضرار", points: -2 },
+                    { description: "التعاون مع السلطات للقبض على شركاء الجريمة", points: -3 },
+                    { description: "إظهار الندم الصادق", points: -1 }
+                ]
+            }
+        ];
+
+        document.getElementById("viewDetailsBtn").addEventListener("click", () => {
+            const selectedArticle = parseInt(document.getElementById("article").value);
+            const articleData = articles.find(a => a.article === selectedArticle);
+
+            if (articleData) {
+                document.getElementById("classification").innerText = articleData.classification;
+                document.getElementById("punishment").innerText = articleData.base_punishment;
+
+                const interpretationTable = document.getElementById("interpretationTable");
+                interpretationTable.innerHTML = `
+                    <tr>
+                        <th>النقاط الإجمالية</th>
+                        <th>خطورة الجريمة</th>
+                        <th>العقوبة المقترحة</th>
+                    </tr>
+                `;
+                articleData.interpretation.forEach(row => {
+                    interpretationTable.innerHTML += `
+                        <tr>
+                            <td>${row.points}</td>
+                            <td>${row.severity}</td>
+                            <td>${row.punishment}</td>
+                        </tr>
+                    `;
+                });
+
+                const aggravatingContainer = document.getElementById("aggravatingFactors");
+                const mitigatingContainer = document.getElementById("mitigatingFactors");
+
+                aggravatingContainer.innerHTML = articleData.aggravating_factors
+                    .map((factor, index) => `<input type="checkbox" id="aggravating-${index}" value="${factor.points}">
+                        <label for="aggravating-${index}">${factor.description}</label><br>`)
+                    .join("");
+
+                mitigatingContainer.innerHTML = articleData.mitigating_factors
+                    .map((factor, index) => `<input type="checkbox" id="mitigating-${index}" value="${factor.points}">
+                        <label for="mitigating-${index}">${factor.description}</label><br>`)
+                    .join("");
+            }
+        });
+
+        document.getElementById("calculateBtn").addEventListener("click", () => {
+            const selectedAggravating = document.querySelectorAll("#aggravatingFactors input:checked");
+            const selectedMitigating = document.querySelectorAll("#mitigatingFactors input:checked");
+
+            const aggravatingPoints = Array.from(selectedAggravating).reduce((sum, checkbox) => sum + parseInt(checkbox.value), 0);
+            const mitigatingPoints = Array.from(selectedMitigating).reduce((sum, checkbox) => sum + parseInt(checkbox.value), 0);
+
+            const totalPoints = aggravatingPoints + mitigatingPoints;
+
+            const selectedArticle = parseInt(document.getElementById("article").value);
+            const articleData = articles.find(a => a.article === selectedArticle);
+
+            let finalPunishment = "لم يتم العثور على تفسير للعقوبة.";
+            for (const rule of articleData.interpretation) {
+                const [min, max] = rule.points.split("-").map(Number);
+                if ((totalPoints >= min && totalPoints <= max) || (rule.points.includes("+") && totalPoints >= min)) {
+                    finalPunishment = `العقوبة المقترحة: ${rule.punishment} (حسب المادة ${articleData.article})`;
+                    break;
+                }
+            }
+
+            document.getElementById("result").innerText = `النقاط الإجمالية: ${totalPoints}`;
+            document.getElementById("finalPunishment").innerText = finalPunishment;
+        });
+    </script>
+</body>
+</html>
